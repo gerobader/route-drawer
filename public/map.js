@@ -10,6 +10,13 @@ let markerCount = 0;
 let polyline;
 let routes;
 
+const saveButton = document.getElementById('save');
+const routeNameInput = document.getElementById('route-name');
+const routeSelect = document.getElementById('route-select');
+const closeButton = document.getElementById('close-button');
+const openButton = document.getElementById('open-button');
+const userInputWrapper = document.getElementsByClassName('user-input')[0];
+
 const createMarker = (lat, lng) => {
   const marker = L.marker([lat, lng], {title: 'marker-' + markerCount}).addTo(map);
   markerCount += 1;
@@ -28,11 +35,10 @@ const updateRouteSelect = () => {
   standardOption.value = '';
   standardOption.innerHTML = '- Select route -';
   routeSelect.appendChild(standardOption);
-  const routeNames = Object.keys(routes);
-  routeNames.forEach((routeName) => {
+  routes.forEach((route) => {
     const option = document.createElement('option');
-    option.value = routeName;
-    option.innerHTML = routeName;
+    option.value = route.name;
+    option.innerHTML = route.name;
     routeSelect.appendChild(option);
   })
 }
@@ -55,12 +61,6 @@ const onMarkerClick = (e) => {
 };
 
 map.on('click', onMapClick);
-const saveButton = document.getElementById('save');
-const routeNameInput = document.getElementById('route-name');
-const routeSelect = document.getElementById('route-select');
-const closeButton = document.getElementById('close-button');
-const openButton = document.getElementById('open-button');
-const userInputWrapper = document.getElementsByClassName('user-input')[0];
 
 saveButton.addEventListener('click', () => {
   const routeName = routeNameInput.value;
@@ -77,9 +77,9 @@ saveButton.addEventListener('click', () => {
         positions: latLongs
       })
     })
-      .then((res) => res.text())
+      .then((res) => res.json())
       .then((result) => {
-        routes = JSON.parse(result);
+        routes = result;
         updateRouteSelect();
       })
   }
@@ -101,7 +101,8 @@ routeSelect.addEventListener('change', (e) => {
   if (polyline) map.removeLayer(polyline);
   const routeName = routeSelect.value;
   if (routeName) {
-    routes[routeName].forEach((markerPosition) => createMarker(markerPosition[0], markerPosition[1]))
+    const selectedRoute = routes.find((route) => route.name === routeName);
+    selectedRoute.markers.forEach((markerPosition) => createMarker(markerPosition[0], markerPosition[1]))
   }
 })
 
@@ -113,9 +114,9 @@ window.addEventListener('load', () => {
       'Content-Type': 'application/json'
     }
   })
-    .then((res) => res.text())
+    .then((res) => res.json())
     .then((result) => {
-      routes = JSON.parse(result);
+      routes = result;
       updateRouteSelect();
     })
 })
