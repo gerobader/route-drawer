@@ -6,7 +6,6 @@ app.use(express.json());
 app.use(express.static('public'));
 
 mongoose.connect(process.env.MONGODB_URI ||'mongodb://localhost:27017/routeDrawer');
-console.log(process.env.MONGODB_URI);
 
 const routeSchema = {name: String, markers: Array, creator: String};
 const Route = mongoose.model('Route', routeSchema);
