@@ -5,21 +5,10 @@ const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const tiles = L.tileLayer(tileUrl, {attribution});
 tiles.addTo(map);
 L.control.locate({}).addTo(map);
-// let currentPosition = L.marker([0, 0], {icon: L.icon({
-//     iconUrl: 'images/current-position.svg',
-//     iconSize: [30, 30]
-//   })
-// }).addTo(map);
 let markers = [];
 let markerCount = 0;
 let polyline;
 let routes;
-
-// const onLocationFound = (location) => {
-//   currentPosition.setLatLng(location.latlng);
-// }
-// map.on('locationfound', onLocationFound);
-// map.locate({watch: true});
 
 const createMarker = (lat, lng) => {
   const marker = L.marker([lat, lng], {title: 'marker-' + markerCount}).addTo(map);
@@ -69,6 +58,9 @@ map.on('click', onMapClick);
 const saveButton = document.getElementById('save');
 const routeNameInput = document.getElementById('route-name');
 const routeSelect = document.getElementById('route-select');
+const closeButton = document.getElementById('close-button');
+const openButton = document.getElementById('open-button');
+const userInputWrapper = document.getElementsByClassName('user-input')[0];
 
 saveButton.addEventListener('click', () => {
   const routeName = routeNameInput.value;
@@ -91,6 +83,16 @@ saveButton.addEventListener('click', () => {
         updateRouteSelect();
       })
   }
+});
+
+closeButton.addEventListener('click', () => {
+  userInputWrapper.classList.remove('open');
+  userInputWrapper.classList.add('closed');
+});
+
+openButton.addEventListener('click', () => {
+  userInputWrapper.classList.add('open');
+  userInputWrapper.classList.remove('closed');
 });
 
 routeSelect.addEventListener('change', (e) => {
