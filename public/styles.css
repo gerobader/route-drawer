@@ -19,7 +19,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 280px;
-    height: 75px;
+    height: auto;
     transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
     overflow: hidden; }
     body .user-input.closed {
