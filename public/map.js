@@ -1,5 +1,4 @@
-// const map = L.map('map').locate({setView: true, maxZoom: 16}); //.setView([51.82673084052198, 14.143797321698354], 14); //
-const map = L.map('map').setView([51.82673084052198, 14.143797321698354], 14);
+const map = L.map('map').locate({setView: true, maxZoom: 16}); //.setView([51.82673084052198, 14.143797321698354], 14); //0
 const attribution = '&copy; <a target="_blank" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const tiles = L.tileLayer(tileUrl, {attribution});
@@ -11,11 +10,16 @@ let polyline;
 let routes;
 
 const saveButton = document.getElementById('save');
+const deleteButton = document.getElementById('delete');
 const routeNameInput = document.getElementById('route-name');
 const routeSelect = document.getElementById('route-select');
 const closeButton = document.getElementById('close-button');
 const openButton = document.getElementById('open-button');
 const userInputWrapper = document.getElementsByClassName('user-input')[0];
+const loader = document.getElementById('loader-wrapper');
+
+const hideLoader = () => loader.classList.add('hide');
+const showLoader = () => loader.classList.remove('hide');
 
 const createMarker = (lat, lng) => {
   const marker = L.marker([lat, lng], {title: 'marker-' + markerCount}).addTo(map);
@@ -29,6 +33,12 @@ const createMarker = (lat, lng) => {
   }
 }
 
+const removeAllRouteElementsFromMap = () => {
+  markers.forEach((marker) => map.removeLayer(marker))
+  markers = [];
+  if (polyline) map.removeLayer(polyline);
+}
+
 const updateRouteSelect = () => {
   routeSelect.innerHTML = '';
   let standardOption = document.createElement('option');
@@ -37,7 +47,7 @@ const updateRouteSelect = () => {
   routeSelect.appendChild(standardOption);
   routes.forEach((route) => {
     const option = document.createElement('option');
-    option.value = route.name;
+    option.value = route._id;
     option.innerHTML = route.name;
     routeSelect.appendChild(option);
   })
@@ -65,6 +75,7 @@ map.on('click', onMapClick);
 saveButton.addEventListener('click', () => {
   const routeName = routeNameInput.value;
   if (routeName) {
+    showLoader();
     const latLongs = markers.map((marker) => [marker._latlng.lat, marker._latlng.lng]);
     fetch('save-route', {
       method: 'POST',
@@ -82,6 +93,31 @@ saveButton.addEventListener('click', () => {
         routes = result;
         updateRouteSelect();
       })
+      .finally(hideLoader)
+  }
+});
+
+deleteButton.addEventListener('click', () => {
+  const routeId = routeSelect.value;
+  if (routeId) {
+    const route = routes.find((route) => route._id === routeId);
+    if (confirm(`Do you want to delete the "${route.name}" route?`)) {
+      showLoader();
+      removeAllRouteElementsFromMap();
+      fetch(`/delete-route/${routeId}`, {
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          routes = result;
+          updateRouteSelect();
+        })
+        .finally(hideLoader)
+    }
   }
 });
 
@@ -96,17 +132,25 @@ openButton.addEventListener('click', () => {
 });
 
 routeSelect.addEventListener('change', (e) => {
-  markers.forEach((marker) => map.removeLayer(marker))
-  markers = [];
-  if (polyline) map.removeLayer(polyline);
-  const routeName = routeSelect.value;
-  if (routeName) {
-    const selectedRoute = routes.find((route) => route.name === routeName);
-    selectedRoute.markers.forEach((markerPosition) => createMarker(markerPosition[0], markerPosition[1]))
+  removeAllRouteElementsFromMap();
+  const routeId = routeSelect.value;
+  if (routeId) {
+    const selectedRoute = routes.find((route) => route._id === routeId);
+    const averagePosition = [0, 0];
+    selectedRoute.markers.forEach((markerPosition) => {
+      averagePosition[0] += markerPosition[0];
+      averagePosition[1] += markerPosition[1];
+      createMarker(markerPosition[0], markerPosition[1])
+    });
+    averagePosition[0] /= selectedRoute.markers.length;
+    averagePosition[1] /= selectedRoute.markers.length;
+    map.flyTo(averagePosition);
   }
+
 })
 
 window.addEventListener('load', () => {
+  showLoader();
   fetch('routes', {
     method: 'GET',
     headers: {
@@ -119,4 +163,5 @@ window.addEventListener('load', () => {
       routes = result;
       updateRouteSelect();
     })
+    .finally(hideLoader)
 })

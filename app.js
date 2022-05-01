@@ -17,19 +17,44 @@ app.get('/', (req, res) => {
 app.post('/save-route', (req, res) => {
   const {name, positions} = req.body;
   const newRoute = new Route({name, markers: positions, creator: 'me'})
-  newRoute.save();
-  Route.find({}, (err, result) => {
+  newRoute.save((err) => {
+    if (err) {
+      console.log(err);
+      res.json({
+        success: false,
+        error: 'Route could not be saved'
+      });
+    } else {
+      Route.find({}, (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          res.json(result);
+        }
+      })
+    }
+  });
+});
+
+app.delete('/delete-route/:routeId', (req, res) => {
+  const {routeId} = req.params;
+  Route.deleteOne({_id: routeId}, (err) => {
     if (err) {
       console.log(err);
     } else {
-      res.json(result);
+      Route.find({}, (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          res.json(result);
+        }
+      })
     }
-  })
+  });
 });
 
 app.get('/routes', (req, res) => {
   Route.find({}, (err, result) => {
-    console.log(result);
     if (err) {
       console.log(err);
     } else {

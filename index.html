@@ -12,23 +12,29 @@
             crossorigin=""></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@[VERSION]/dist/L.Control.Locate.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol@0.76.0/dist/L.Control.Locate.min.js" charset="utf-8"></script>
-    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link rel="stylesheet" type="text/css" href="styles.css"/>
 </head>
 <body>
 <div id="map"></div>
-<div class="user-input open">
-    <div id="close-button"></div>
-    <div id="open-button">
-        <div class="stripe"></div>
-        <div class="stripe"></div>
-        <div class="stripe"></div>
-    </div>
-    <div class="input-wrapper">
-        <div class="one-line">
-            <input id="route-name" type="text" placeholder="Route Name"/>
-            <button id="save" type="submit">Save Route</button>
+<div class="input-container">
+    <div class="user-input open">
+        <div id="loader-wrapper">
+            <div class="loader"></div>
         </div>
-        <select id="route-select"></select>
+        <div id="close-button"></div>
+        <div id="open-button">
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+            <div class="stripe"></div>
+        </div>
+        <div class="input-wrapper">
+            <div class="one-line">
+                <input id="route-name" type="text" placeholder="Route Name"/>
+                <button id="save">Save Route</button>
+            </div>
+            <select id="route-select"></select>
+            <button id="delete">Delete selected Route</button>
+        </div>
     </div>
 </div>
 <script type="text/javascript" src="map.js"></script>
