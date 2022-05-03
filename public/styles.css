@@ -7,14 +7,6 @@ body {
       @supports (height: -webkit-fill-available) {
         body #map {
           height: -webkit-fill-available; } } }
-  body #test {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 50px;
-    height: calc(100vh - 10px);
-    z-index: 1000;
-    background: #fff; }
   body .input-container {
     position: absolute;
     right: 10px;
