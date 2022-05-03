@@ -1,5 +1,9 @@
 body {
   margin: 0; }
+  body .primary-button {
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    color: #fff; }
   body #map {
     width: 100vw;
     height: 100vh; }
@@ -7,6 +11,45 @@ body {
       @supports (height: -webkit-fill-available) {
         body #map {
           height: -webkit-fill-available; } } }
+  body .modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out; }
+    body .modal.hide {
+      opacity: 0;
+      pointer-events: none; }
+    body .modal .background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(15px); }
+    body .modal .user-login {
+      z-index: 2;
+      width: 200px;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 10px;
+      border-radius: 5px;
+      background: white; }
+      body .modal .user-login input {
+        height: 24px;
+        margin-bottom: 10px; }
+      body .modal .user-login button {
+        height: 24px;
+        color: #fff;
+        background-color: #337ab7; }
   body .input-container {
     position: absolute;
     right: 10px;
@@ -20,12 +63,13 @@ body {
       display: flex;
       flex-direction: column;
       width: 280px;
-      height: auto;
+      height: 129px;
       transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
-      overflow: hidden; }
+      overflow: hidden;
+      box-sizing: border-box; }
       body .input-container .user-input.closed {
-        width: 18px;
-        height: 18px; }
+        width: 38px;
+        height: 38px; }
         body .input-container .user-input.closed .input-wrapper {
           display: none; }
         body .input-container .user-input.closed #open-button {
@@ -94,8 +138,6 @@ body {
           flex-grow: 3;
           margin-right: 5px; }
         body .input-container .user-input .input-wrapper .one-line button {
-          background-color: #337ab7;
-          border-color: #2e6da4;
           flex-grow: 1; }
       body .input-container .user-input .input-wrapper #route-select {
         width: 100%;

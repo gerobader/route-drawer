@@ -16,9 +16,16 @@
 </head>
 <body>
 <div id="map"></div>
+<div class="modal" id="login-modal">
+    <div class="background"></div>
+    <div class="user-login">
+        <input id="user-name" placeholder="Username">
+        <button id="login" class="primary-button">Login</button>
+    </div>
+</div>
 <div class="input-container">
     <div class="user-input open">
-        <div id="loader-wrapper">
+        <div id="loader-wrapper" class="hide">
             <div class="loader"></div>
         </div>
         <div id="close-button"></div>
@@ -30,7 +37,7 @@
         <div class="input-wrapper">
             <div class="one-line">
                 <input id="route-name" type="text" placeholder="Route Name"/>
-                <button id="save">Save Route</button>
+                <button class="primary-button" id="save">Save Route</button>
             </div>
             <select id="route-select"></select>
             <button id="delete">Delete selected Route</button>

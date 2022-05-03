@@ -8,6 +8,7 @@ let markers = [];
 let markerCount = 0;
 let polyline;
 let routes;
+let username = 'standart';
 
 const saveButton = document.getElementById('save');
 const deleteButton = document.getElementById('delete');
@@ -17,6 +18,9 @@ const closeButton = document.getElementById('close-button');
 const openButton = document.getElementById('open-button');
 const userInputWrapper = document.getElementsByClassName('user-input')[0];
 const loader = document.getElementById('loader-wrapper');
+const loginModal = document.getElementById('login-modal');
+const usernameInput = document.getElementById('user-name');
+const loginButton = document.getElementById('login');
 
 const hideLoader = () => loader.classList.add('hide');
 const showLoader = () => loader.classList.remove('hide');
@@ -85,7 +89,8 @@ saveButton.addEventListener('click', () => {
       },
       body: JSON.stringify({
         name: routeName,
-        positions: latLongs
+        positions: latLongs,
+        creator: username
       })
     })
       .then((res) => res.json())
@@ -104,7 +109,7 @@ deleteButton.addEventListener('click', () => {
     if (confirm(`Do you want to delete the "${route.name}" route?`)) {
       showLoader();
       removeAllRouteElementsFromMap();
-      fetch(`/delete-route/${routeId}`, {
+      fetch(`/delete-route?creator=${username}&routeId=${routeId}`, {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json',
@@ -131,6 +136,25 @@ openButton.addEventListener('click', () => {
   userInputWrapper.classList.remove('closed');
 });
 
+loginButton.addEventListener('click', () => {
+  username = usernameInput.value.toLowerCase();
+  loginModal.classList.add('hide');
+  showLoader();
+  fetch(`/routes/${username}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      routes = result;
+      updateRouteSelect();
+    })
+    .finally(hideLoader)
+});
+
 routeSelect.addEventListener('change', (e) => {
   removeAllRouteElementsFromMap();
   const routeId = routeSelect.value;
@@ -147,21 +171,4 @@ routeSelect.addEventListener('change', (e) => {
     map.flyTo(averagePosition);
   }
 
-})
-
-window.addEventListener('load', () => {
-  showLoader();
-  fetch('routes', {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
-  })
-    .then((res) => res.json())
-    .then((result) => {
-      routes = result;
-      updateRouteSelect();
-    })
-    .finally(hideLoader)
 })
