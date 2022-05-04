@@ -21,9 +21,32 @@ const loader = document.getElementById('loader-wrapper');
 const loginModal = document.getElementById('login-modal');
 const usernameInput = document.getElementById('user-name');
 const loginButton = document.getElementById('login');
+const routeLengthDisplay = document.getElementById('route-length');
 
 const hideLoader = () => loader.classList.add('hide');
 const showLoader = () => loader.classList.remove('hide');
+
+const updateRouteLength = () => {
+  if (polyline) {
+    let distanceUnit = 'm';
+    let previousLocation;
+    let distance = 0;
+    polyline.getLatLngs().forEach((latLng) => {
+      if (previousLocation) {
+        distance += previousLocation.distanceTo(latLng);
+      }
+      previousLocation = latLng;
+    });
+    distance = Math.round(distance);
+    if (distance > 1000) {
+      distance /= 1000;
+      distanceUnit = 'km';
+    }
+    routeLengthDisplay.innerHTML = `${distance.toString().replace('.', ',')}${distanceUnit}`;
+  } else {
+    routeLengthDisplay.innerHTML = '0m';
+  }
+}
 
 const onMarkerDrag = (e, draggedMarker) => {
   let vertexIndex = 0;
@@ -37,6 +60,7 @@ const onMarkerDrag = (e, draggedMarker) => {
   const polyLineLatLongs = [...polyline._latlngs];
   polyLineLatLongs[vertexIndex] = draggedMarker._latlng;
   polyline.setLatLngs(polyLineLatLongs);
+  updateRouteLength();
 }
 
 const createMarker = (lat, lng) => {
@@ -52,13 +76,18 @@ const createMarker = (lat, lng) => {
       const latLongs = markers.map((marker) => [marker._latlng.lat, marker._latlng.lng]);
       polyline = L.polyline(latLongs, {color: 'blue'}).addTo(map);
     }
+    updateRouteLength();
   }
 }
 
 const removeAllRouteElementsFromMap = () => {
   markers.forEach((marker) => map.removeLayer(marker))
   markers = [];
-  if (polyline) map.removeLayer(polyline);
+  if (polyline) {
+    map.removeLayer(polyline);
+    polyline = undefined;
+  }
+  updateRouteLength();
 }
 
 const updateRouteSelect = () => {
@@ -87,9 +116,14 @@ const onMarkerClick = (e) => {
     }
     return true;
   });
-  const latLongs = markers.map((marker) => [marker._latlng.lat, marker._latlng.lng]);
-  map.removeLayer(polyline);
-  polyline = L.polyline(latLongs, {color: 'blue'}).addTo(map);
+  if (markers.length) {
+    const latLongs = markers.map((marker) => [marker._latlng.lat, marker._latlng.lng]);
+    map.removeLayer(polyline);
+    polyline = L.polyline(latLongs, {color: 'blue'}).addTo(map);
+  } else {
+    polyline = undefined;
+  }
+  updateRouteLength();
 };
 
 map.on('click', onMapClick);
@@ -188,5 +222,4 @@ routeSelect.addEventListener('change', (e) => {
     averagePosition[1] /= selectedRoute.markers.length;
     map.flyTo(averagePosition);
   }
-
-})
+});

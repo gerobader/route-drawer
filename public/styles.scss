@@ -176,4 +176,14 @@ body {
       }
     }
   }
+  .route-info-wrapper{
+    z-index: 1000;
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
+    border-radius: 4px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+  }
 }
