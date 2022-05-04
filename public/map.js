@@ -9,6 +9,7 @@ let markerCount = 0;
 let polyline;
 let routes;
 let username = 'standart';
+let routeLocked = false;
 
 const saveButton = document.getElementById('save');
 const deleteButton = document.getElementById('delete');
@@ -22,6 +23,7 @@ const loginModal = document.getElementById('login-modal');
 const usernameInput = document.getElementById('user-name');
 const loginButton = document.getElementById('login');
 const routeLengthDisplay = document.getElementById('route-length');
+const routeLock = document.getElementById('route-lock');
 
 const hideLoader = () => loader.classList.add('hide');
 const showLoader = () => loader.classList.remove('hide');
@@ -49,6 +51,7 @@ const updateRouteLength = () => {
 }
 
 const onMarkerDrag = (e, draggedMarker) => {
+  if (routeLocked) return;
   let vertexIndex = 0;
   markers.find((marker, index) => {
     if (marker.options.title === draggedMarker.options.title) {
@@ -64,6 +67,7 @@ const onMarkerDrag = (e, draggedMarker) => {
 }
 
 const createMarker = (lat, lng) => {
+  if (routeLocked) return;
   const marker = L.marker([lat, lng], {title: 'marker-' + markerCount, draggable: true}).addTo(map);
   marker.on('click', onMarkerClick)
   marker.on('drag', (e) => onMarkerDrag(e, marker));
@@ -105,10 +109,12 @@ const updateRouteSelect = () => {
 }
 
 const onMapClick = (e) => {
+  if (routeLocked) return;
   createMarker(e.latlng.lat, e.latlng.lng);
 };
 
 const onMarkerClick = (e) => {
+  if (routeLocked) return;
   markers = markers.filter((marker) => {
     if (marker.options.title === e.target.options.title) {
       map.removeLayer(marker);
@@ -155,6 +161,7 @@ saveButton.addEventListener('click', () => {
 });
 
 deleteButton.addEventListener('click', () => {
+  if (routeLocked) return;
   const routeId = routeSelect.value;
   if (routeId) {
     const route = routes.find((route) => route._id === routeId);
@@ -208,6 +215,8 @@ loginButton.addEventListener('click', () => {
 });
 
 routeSelect.addEventListener('change', (e) => {
+  routeLocked = false;
+  routeLock.checked = false;
   removeAllRouteElementsFromMap();
   const routeId = routeSelect.value;
   if (routeId) {
@@ -221,5 +230,15 @@ routeSelect.addEventListener('change', (e) => {
     averagePosition[0] /= selectedRoute.markers.length;
     averagePosition[1] /= selectedRoute.markers.length;
     map.flyTo(averagePosition);
+    document.getElementsByClassName('route-lock-wrapper')[0].classList.remove('hide');
+  } else {
+    document.getElementsByClassName('route-lock-wrapper')[0].classList.add('hide');
   }
+});
+
+routeLock.addEventListener('change', () => {
+  routeLocked = routeLock.checked;
+  markers.forEach((marker) => {
+    marker.setOpacity(routeLocked ? 0 : 1);
+  })
 });

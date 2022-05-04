@@ -35,12 +35,18 @@
             <div class="stripe"></div>
         </div>
         <div class="input-wrapper">
-            <div class="one-line">
+            <div class="one-line top-margin">
                 <input id="route-name" type="text" placeholder="Route Name"/>
                 <button class="primary-button" id="save">Save Route</button>
             </div>
             <select id="route-select"></select>
-            <button id="delete">Delete selected Route</button>
+            <div class="one-line">
+                <button id="delete">Delete selected Route</button>
+                <div class="route-lock-wrapper hide">
+                    <label for="route-lock">Lock Route</label>
+                    <input name="route-lock" type="checkbox" id="route-lock">
+                </div>
+            </div>
         </div>
     </div>
 </div>

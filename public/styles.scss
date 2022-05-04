@@ -153,15 +153,30 @@ body {
         }
       }
       .input-wrapper{
+        color: #fff;
         .one-line{
-          margin: 25px 0 10px;
+          margin-bottom: 10px;
           display: flex;
-          input{
+          justify-content: space-between;
+          &.top-margin{
+            margin-top: 25px;
+          }
+          #route-name{
             flex-grow: 3;
             margin-right: 5px;
           }
-          button{
+          #save{
             flex-grow: 1;
+          }
+          .route-lock-wrapper{
+            display: flex;
+            justify-content: center;
+            &.hide{
+              display: none;
+            }
+            label{
+              user-select: none;
+            }
           }
         }
         #route-select{
