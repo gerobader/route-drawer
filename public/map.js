@@ -25,15 +25,33 @@ const loginButton = document.getElementById('login');
 const hideLoader = () => loader.classList.add('hide');
 const showLoader = () => loader.classList.remove('hide');
 
+const onMarkerDrag = (e, draggedMarker) => {
+  let vertexIndex = 0;
+  markers.find((marker, index) => {
+    if (marker.options.title === draggedMarker.options.title) {
+      vertexIndex = index;
+      return true;
+    }
+    return false;
+  });
+  const polyLineLatLongs = [...polyline._latlngs];
+  polyLineLatLongs[vertexIndex] = draggedMarker._latlng;
+  polyline.setLatLngs(polyLineLatLongs);
+}
+
 const createMarker = (lat, lng) => {
-  const marker = L.marker([lat, lng], {title: 'marker-' + markerCount}).addTo(map);
-  markerCount += 1;
+  const marker = L.marker([lat, lng], {title: 'marker-' + markerCount, draggable: true}).addTo(map);
   marker.on('click', onMarkerClick)
+  marker.on('drag', (e) => onMarkerDrag(e, marker));
   markers.push(marker);
+  markerCount += 1;
   if (markers.length > 1) {
-    if (polyline) map.removeLayer(polyline);
-    const latLongs = markers.map((marker) => [marker._latlng.lat, marker._latlng.lng]);
-    polyline = L.polyline(latLongs, {color: 'blue'}).addTo(map);
+    if (polyline) {
+      polyline.addLatLng([lat, lng]);
+    } else {
+      const latLongs = markers.map((marker) => [marker._latlng.lat, marker._latlng.lng]);
+      polyline = L.polyline(latLongs, {color: 'blue'}).addTo(map);
+    }
   }
 }
 
